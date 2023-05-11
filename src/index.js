@@ -41,10 +41,10 @@ function renderCountryList(countries) {
 
     if (countries.length === 0) {
         // Якщо не знайдено країну, виводимо повідомлення про помилку
-        Notiflix.Notify.failure('Oops, there is no country with that name');
+        Notify.failure('Oops, there is no country with that name');
     } else if (countries.length > 10) {
         // Якщо знайдено більше 10 країн, виводимо повідомлення про специфічнішу назву
-        Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
+        Notify.info('Too many matches found. Please enter a more specific name.');
     } else if (countries.length > 1 && countries.length <= 10) {
         // Якщо знайдено одну країну, виводимо розмітку з даними про країну
         displayCountryList(countries);
