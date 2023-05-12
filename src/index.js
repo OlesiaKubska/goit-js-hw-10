@@ -2,7 +2,7 @@ import './css/styles.css';
 
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
-import { fetchCountries } from './fetchCountries';
+import { fetchCountries } from './fetchCountries.js';
 
 const DEBOUNCE_DELAY = 300;
 
@@ -11,13 +11,8 @@ const countryInfo = document.querySelector('.country-info');
 const searchBox = document.querySelector('#search-box');
 const body = document.querySelector('body');
 
-body.style.
-
 countriesList.style.visibility = 'hidden';
 countryInfo.style.visibility = 'hidden';
-
-searchBox.addEventListener('input', debounce(onInputSearch, DEBOUNCE_DELAY));
-
 
 // Додаємо обробник події 'input' на поле пошуку
 searchBox.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
@@ -31,9 +26,10 @@ function onSearch() {
         return;
     }
 
-    fetchCountries(searchValue)
+    fetchCountries(searchValue, 'name.official,capital,population,flags.svg,languages')
+    
         .then(renderCountryList)
-        .catch(error => console.log(error));
+        .catch(error => Notify.failure(error));
 }
 
 function renderCountryList(countries) {
@@ -80,9 +76,9 @@ function displayCountryInfo(country) {
         </div>
         <div class="country-info__details">
             <h2>${official}</h2>
-                <p><strong>Capital:</strong> ${capital}</p>
-                <p><strong>Population:</strong> ${population.toLocaleString()}</p>
-                <p><strong>Languages:</strong> ${languages.map(lang => lang.name).join(', ')}</p>
+            <p><strong>Capital:</strong> ${capital}</p>
+            <p><strong>Population:</strong> ${population.toLocaleString()}</p>
+            <p><strong>Languages:</strong> ${languages.map(lang => lang.name).join(', ')}</p>
         </div>
 `;
 
