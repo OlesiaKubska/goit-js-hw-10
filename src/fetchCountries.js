@@ -5,12 +5,12 @@ const URL = `https://restcountries.com/v3.1/name/`;
 //а також додаємо параметри пошуку, які включають потрібні властивості країни.
 
 const searchParams = new URLSearchParams({
-    fields: 'name,capital,population,flags,languages,',
+    fields: 'name.official,capital,population,flags.svg,languages,',
 });
 
 
 export const fetchCountries = (name) => {
-    return fetch(`${URL}${name}?${searchParams.toString()}`)
+    return fetch(`${URL}${name}?${searchParams}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(response.status);

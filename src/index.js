@@ -18,16 +18,20 @@ function onSearch() {
     const searchValue = searchBox.value.trim(); //Отримується значення пошуку з поля введення та проводиться санітизація рядка методом trim()
 
     // Якщо поле пошуку порожнє, очищаємо розмітку списку країн та інформації про країну
-    if (searchValue === '') {
-        clearMarkup();
-        return;
+    if (searchValue) {
+        fetchCountries(searchValue, 'name.official,capital,population,flags.svg,languages')
+    
+            .then(renderCountryList)
+            .catch(() => {
+                Notify.failure('Oops, there is no country with that name');
+            });
+    } else {
+        clearMarkup(); //Очищує розмітку списку країн.
     }
 //Виконується HTTP-запит до функції fetchCountries з передачею значення пошуку та властивостей країни для отримання даних. 
-    fetchCountries(searchValue, 'name.official,capital,population,flags.svg,languages')
     
-        .then(renderCountryList)
-        .catch(error => Notify.failure(error));
 }
+
 //При отриманні результату викликається функція renderCountryList для відображення списку країн або повідомлення про помилку.
 function renderCountryList(countries) {
     clearMarkup(); //Очищує розмітку списку країн.
@@ -73,7 +77,7 @@ function displayCountryInfo(country) {
     //Присвоює отриману розмітку змінній countryInfoMarkup.
     const countryInfoMarkup = `
         <div class="country-info__flag">
-            <img src="${svg}" alt="${official} flag" width="40" height="20" />
+            <img src="${svg}" alt="${official} flag" width="40" height="auto" />
         </div>
         <div class="country-info__details">
             <h2>${official}</h2>
