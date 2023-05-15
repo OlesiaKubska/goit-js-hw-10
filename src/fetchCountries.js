@@ -4,12 +4,11 @@ const URL = `https://restcountries.com/v3.1/name/`;
 //створюємо URL для запиту до API країн за допомогою вказаного імені, 
 //а також додаємо параметри пошуку, які включають потрібні властивості країни.
 
-const searchParams = new URLSearchParams({
-    fields: 'name.official,capital,population,flags.svg,languages,',
-});
-
-
 export const fetchCountries = (name) => {
+    const searchParams = new URLSearchParams({
+        fields: 'name.official,capital,population,flags.svg,languages,',
+    });
+    
     return fetch(`${URL}${name}?${searchParams}`)
         .then(response => {
             if (!response.ok) {
@@ -17,4 +16,4 @@ export const fetchCountries = (name) => {
             }
             return response.json();
         });
-};
+}
