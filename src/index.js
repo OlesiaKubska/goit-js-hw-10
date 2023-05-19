@@ -3,6 +3,7 @@ import './css/styles.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce'; // Імпортуємо debounce з пакету lodash.debounce
 import { fetchCountries } from './js/fetchCountries.js';
+import { result } from 'lodash';
 
 const DEBOUNCE_DELAY = 300; //Встановлює затримку DEBOUNCE_DELAY в 300 мс.
 
@@ -36,7 +37,7 @@ function renderedCountries(countries) {
 
     if (countries.length === 1) {
         clearMarkup();
-        displayCountryInfo(country[0]);
+        displayCountryInfo(countries);
     }
 
     if (countries.length > 1 && countries.length <= 10) {
@@ -64,14 +65,15 @@ function displayCountryList(countries) {
 
 //функція displayCountryInfo(country) отримує об'єкт країни
 function displayCountryInfo(country) {
-    const { flags, name, capital, population, languages } = country;
-    const formattedLanguages = languages.map(lang => lang.name).join(", ");
-    const countryInfoMarkup = /*html*/ `
-        <img src="${flags.svg}" alt="${name.official}" width="320" height="auto">
-        <p>${name.official}</p>
-        <p>Capital: <strong>${capital}</strong></p>
-        <p>Population: <strong>${population}</strong></p>
-        <p>Languages: <strong>${formattedLanguages}</strong></p>`;
+    const countryInfoMarkup = country.map(({ flags, name, capital, population, languages }) => {
+        languages = Object.values(languages).join(", ");
+        return /*html*/ `
+            <img src="${flags.svg}" alt="${name.official}" width="320" height="auto">
+            <p>${name.official}</p>
+            <p>Capital: <strong>${capital}</strong></p>
+            <p>Population: <strong>${population}</strong></p>
+            <p>Languages: <strong>${languages}</strong></p>`;
+    }).join('');
     
     countryInfo.innerHTML = countryInfoMarkup;
     return countryInfoMarkup;
