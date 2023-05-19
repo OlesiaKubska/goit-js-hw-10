@@ -43,3 +43,12 @@ ul {
 .country-info__details p {
   margin: 5px 0;
 }
+
+.country-item {
+  display: flex;
+  align-items: center;
+}
+
+.country-item>p {
+  margin-left: 8px;
+}

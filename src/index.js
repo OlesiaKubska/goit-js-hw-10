@@ -2,7 +2,7 @@ import './css/styles.css';
 
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce'; // Імпортуємо debounce з пакету lodash.debounce
-import { fetchCountries } from './fetchCountries.js';
+import { fetchCountries } from './js/fetchCountries.js';
 
 const DEBOUNCE_DELAY = 300; //Встановлює затримку DEBOUNCE_DELAY в 300 мс.
 
@@ -18,71 +18,63 @@ searchBox.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
 function onSearch() {
     const searchValue = searchBox.value.trim(); //Отримується значення пошуку з поля введення та проводиться санітизація рядка методом trim()
 
-    // Якщо поле пошуку порожнє, очищаємо розмітку списку країн та інформації про країну
-    if (searchValue === '') {
-        clearMarkup();
-        return;
-    }
-        // Виконуємо HTTP-запит до API країн з введеним значенням пошуку
     fetchCountries(searchValue)
         .then(countries => {
-            // Обробка отриманих даних
-            if (countries.length === 0) {
-                Notify.failure('Oops, there is no country with that name');
-                clearMarkup();
-            } else if (countries.length === 1) {
-                displayCountryInfo(country[0]); // Виклик функції для відображення даних про країну
-            
-            } else if (countries.length > 1 && countries.length <= 10) {
-                renderCountryList(countries); // Виклик функції для відображення списку країн
-            } else {
-                Notify.info('Too many matches found. Please enter a more specific name.');
-                clearMarkup();
+            if (countries.length > 10) {
+                Notify.info('Too many matches found. Please, enter a more specific name.');
+                return;
             }
+            renderedCountries(countries);
         })
-            // Обробка помилки
-        .catch(() => {
-            Notify.failure('Oops, there is no country with that name');
+        .catch(error => {
             clearMarkup();
-        });
+            Notify.failure('Oops, there is no country with that name');
+        })
 }
 
-//При отриманні результату викликається функція renderCountryList для відображення списку країн або повідомлення про помилку.
-function renderCountryList(countries) {
+function renderedCountries(countries) {
+
+    if (countries.length === 1) {
+        clearMarkup();
+        displayCountryInfo(country[0]);
+    }
+
+    if (countries.length > 1 && countries.length <= 10) {
+        clearMarkup();
+        displayCountryList(countries);
+    }
+}
+    
+function displayCountryList(countries) {
     countriesList.innerHTML = ''; // Очищаємо розмітку списку країн
     
-    countries.forEach(country => {
-        const { flags: { svg }, name: { official } } = country; //Деструктурує властивості flags.svg та name.official з кожної країни.
+    const countriesListMarkup = countries
+        .map(country => {
+            const { flags: { svg }, name: { official } } = country;
+            return `<li class="country-item">
+                        <img src="${country.flags.svg}" alt="${official} flag" width="40" height="auto" />
+                        <p>${official}</p>
+                    </li>`;
+        })
+        .join('');
 
-        const listItem = document.createElement('li');//Створює новий елемент <li> для кожної країни.
-        listItem.innerHTML = `<img src="${svg}" alt="${official} flag" /> ${official}`;
-
-        countriesList.appendChild(listItem);//Додає елемент <li> до списку країн (countriesList).
-    });
-
+    countriesList.innerHTML = countriesListMarkup;
     clearCountryInfo();
 }
 
 //функція displayCountryInfo(country) отримує об'єкт країни
 function displayCountryInfo(country) {
-    clearCountryInfo(); //Викликає функцію clearCountryInfo для очищення попередньої інформації про країну.
-    //Деструктурує: 
-    const { flags: { svg }, name: { official }, capital, population, languages } = country;
-//Створює розмітку для відображення інформації про країну, використовуючи отримані властивості.
-    //Присвоює отриману розмітку змінній countryInfoMarkup.
-    const countryInfoMarkup = `
-        <div class="country-info__flag">
-            <img src="${svg}" alt="${official} flag" width="40" height="auto" />
-        </div>
-        <div class="country-info__details">
-            <h2>${official}</h2>
-            <p><strong>Capital:</strong> ${capital}</p>
-            <p><strong>Population:</strong> ${population.toLocaleString()}</p>
-            <p><strong>Languages:</strong> ${languages.map(lang => lang.name).join(', ')}</p>
-        </div>`;
-
-    countryInfo.innerHTML = countryInfoMarkup; //Заміщує вміст елементу countryInfo отриманою розміткою, щоб відобразити інформацію про країну.
+    const { flags, name, capital, population, languages } = country;
+    const formattedLanguages = languages.map(lang => lang.name).join(", ");
+    const countryInfoMarkup = /*html*/ `
+        <img src="${flags.svg}" alt="${name.official}" width="320" height="auto">
+        <p>${name.official}</p>
+        <p>Capital: <strong>${capital}</strong></p>
+        <p>Population: <strong>${population}</strong></p>
+        <p>Languages: <strong>${formattedLanguages}</strong></p>`;
     
+    countryInfo.innerHTML = countryInfoMarkup;
+    return countryInfoMarkup;
 }  
 
 // Функція, яка очищує розмітку списку країн або інформації про країну
